@@ -1,1 +1,3 @@
 # CS-170-Project-1
+## All code made by Jarod Najera SID: 862179022
+## I apologize for my ugly code...
