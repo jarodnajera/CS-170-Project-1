@@ -272,7 +272,7 @@ class Node:
                 return expanded_nodes, current_node.depth, max_queue_size
             
             # Traceback
-            print(f'Best node to expand with g(n)={current_node.depth} and f(n)={current_node.fn}')
+            print(f'Best node to expand with g(n)={current_node.depth} and f(n)={current_node.depth}')
             print(f'Current Board: {current_node.key}')
             print('\n')
             
