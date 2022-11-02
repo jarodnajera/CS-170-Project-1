@@ -103,7 +103,7 @@ class Node:
             misplaced_tiles += 1
         
         # f(n) = h(n)
-        self.fn = misplaced_tiles
+        self.fn = misplaced_tiles + self.depth
     
     # Calculate f(n) using Manhattan Distance Heuristic
     def Calc_Manhattan_fn(self):
@@ -242,8 +242,8 @@ class Node:
             elif self.key[2][1] == 7:
                 distance += 1
 
-        # f(n) = h(n)
-        self.fn = misplaced_tiles + distance
+        # f(n) = h(n) + g(n)
+        self.fn = (misplaced_tiles + distance) + self.depth
     
     """
     Since h(n) = 0, we do not have to consider it as both weight and
@@ -260,6 +260,7 @@ class Node:
         visited = [] # Prevent state repetition 
 
         expanded_nodes = 0 # Keep track of expanded nodes
+        max_queue_size = 1 # Keep track of largest queue size
 
         # Search
         while nodes:
@@ -267,10 +268,13 @@ class Node:
 
             # Success
             if current_node.key == goal_state:
-                return expanded_nodes, current_node.depth
+                print(f'Max queue size: {max_queue_size}')
+                return expanded_nodes, current_node.depth, max_queue_size
             
-            # Uncomment for debugging
-            # print(current_node.key, current_node.depth)
+            # Traceback
+            print(f'Best node to expand with g(n)={current_node.depth} and f(n)={current_node.fn}')
+            print(f'Current Board: {current_node.key}')
+            print('\n')
             
             # Add current_node to visited[]
             visited.append(current_node)
@@ -294,6 +298,7 @@ class Node:
                 nodes.append(right)
     
             expanded_nodes += 1
+            max_queue_size = max(max_queue_size, len(nodes))
         
         # Failure
         return expanded_nodes, -1
@@ -310,7 +315,7 @@ class Node:
         trace = list()
 
         expanded_nodes = 0 # Keep track of expanded nodes
-        max_queue_size = 0
+        max_queue_size = 1 # Keep track of largest queue size
 
         # Search
         while nodes:
@@ -319,10 +324,13 @@ class Node:
 
             # Success
             if current_node.key == goal_state:
-                return expanded_nodes, current_node.depth
+                print(f'Max queue size: {max_queue_size}')
+                return expanded_nodes, current_node.depth, max_queue_size
             
-            # Uncomment for debugging
-            # print(current_node.key, current_node.depth)
+            # Traceback
+            print(f'Best node to expand with g(n)={current_node.depth} and f(n)={current_node.fn}')
+            print(f'Current Board: {current_node.key}')
+            print('\n')
             
             # Add current_node to visited[]
             visited.append(current_node)
@@ -333,6 +341,7 @@ class Node:
             left = Node(current_node.Left_Operator(), current_node.depth+1)
             right = Node(current_node.Right_Operator(), current_node.depth+1)
 
+            # Calculate f(n) using Misplaced Tiles Heuristic
             up.Calc_Misplaced_fn()
             down.Calc_Misplaced_fn()
             left.Calc_Misplaced_fn()
@@ -352,11 +361,14 @@ class Node:
             other.sort(key=attrgetter('fn'))
             trace += other
 
+            # Hit a dead end, try other possible routes
             if len(nodes) == 0:
                 nodes.append(trace.pop(0))
 
             expanded_nodes += 1
+            max_queue_size = max(max_queue_size, len(nodes))
         
+        # Failure
         return expanded_nodes, -1
     
     def A_Manhattan_Distance(self):
@@ -371,7 +383,7 @@ class Node:
         trace = list()
 
         expanded_nodes = 0 # Keep track of expanded nodes
-        max_queue_size = 0
+        max_queue_size = 1 # Keep track of largest queue size
 
         # Search
         while nodes:
@@ -380,10 +392,13 @@ class Node:
 
             # Success
             if current_node.key == goal_state:
-                return expanded_nodes, current_node.depth
+                print('Success!')
+                return expanded_nodes, current_node.depth, max_queue_size
             
-            # Uncomment for debugging
-            # print(current_node.key, current_node.depth)
+            # Traceback
+            print(f'Best node to expand with g(n)={current_node.depth} and f(n)={current_node.fn}')
+            print(f'Current Board: {current_node.key}')
+            print('\n')
             
             # Add current_node to visited[]
             visited.append(current_node)
@@ -394,6 +409,7 @@ class Node:
             left = Node(current_node.Left_Operator(), current_node.depth+1)
             right = Node(current_node.Right_Operator(), current_node.depth+1)
 
+            # Calculate f(n) using Manhattan Distance Heuristic
             up.Calc_Manhattan_fn()
             down.Calc_Manhattan_fn()
             left.Calc_Manhattan_fn()
@@ -413,9 +429,12 @@ class Node:
             other.sort(key=attrgetter('fn'))
             trace += other
 
+            # Hit a dead end, try other possible routes
             if len(nodes) == 0:
                 nodes.append(trace.pop(0))
 
             expanded_nodes += 1
+            max_queue_size = max(max_queue_size, len(nodes))
         
+        # Failure
         return expanded_nodes, -1
